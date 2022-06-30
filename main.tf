@@ -16,6 +16,7 @@ data "tfe_outputs" "outputs" {
   workspace = "Slytherin_Azure_LandingZone"
 }
 
+# Create a resource group
 resource "azurerm_resource_group" "rg" {
   name      = "project-${var.NAME}"
   location  = nonsensitive(data.tfe_outputs.outputs.values.resource_group_location)
@@ -28,6 +29,7 @@ resource "azurerm_resource_group" "rg" {
   }
 }
 
+# Create a network interface
 resource "azurerm_network_interface" "nic" {
   name                = "${var.NAME}-nic"
   location            = "${azurerm_resource_group.rg.location}"
@@ -40,6 +42,7 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
+# Create Virtual Machine
 resource "azurerm_virtual_machine" "vm" {
   name                  = "${var.NAME}-vm"
   location              = nonsensitive(data.tfe_outputs.outputs.values.resource_group_location)
