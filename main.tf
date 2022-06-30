@@ -40,34 +40,49 @@ resource "azurerm_network_interface" "nic" {
     subnet_id                     = nonsensitive(data.tfe_outputs.outputs.values.subnet_id)
     private_ip_address_allocation = "Dynamic"
   }
+
+   tags = {
+    owner               = "${var.NAME}"
+    project             = "project-${var.NAME}"
+    terraform           = "true"
+    environment         = "dev"
+  }
 }
 
 # Create Virtual Machine
-resource "azurerm_linux_virtual_machine" "vm" {
+resource "azurerm_virtual_machine" "vm" {
   name                  = "${var.NAME}-vm"
   location              = nonsensitive(data.tfe_outputs.outputs.values.resource_group_location)
   resource_group_name   = nonsensitive(data.tfe_outputs.outputs.values.resource_group_name)
   network_interface_ids = ["${azurerm_network_interface.nic.id}"]
   vm_size               = "Standard_F2"
-  admin_username        = "ubuntu"
-
-  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
-  delete_os_disk_on_termination = true
 
   storage_image_reference {
     id = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image 
   }
 
-  admin_ssh_key {
-    username   = "ubuntu"
-    public_key = file("~/.ssh/id_rsa.pub")
+  os_profile {
+    computer_name  = "hostname"
+    admin_username = "testadmin"
+    admin_password = "${var.PW}"
   }
-
-  os_disk {
+  
+  os_profile_linux_config {
+    disable_password_authentication = false
+  }
+  
+  storage_os_disk {
     name              = "osdisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
+  }
+
+  tags = {
+    owner               = "${var.NAME}"
+    project             = "project-${var.NAME}"
+    terraform           = "true"
+    environment         = "dev"
   }
   
 }
