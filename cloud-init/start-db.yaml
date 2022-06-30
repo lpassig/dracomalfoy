@@ -25,7 +25,3 @@ runcmd:
   - sudo systemctl start mongod
   - sudo systemctl status mongod
   - sudo systemctl enable mongod
-  # - mongo
-  # - use testdb
-  # - show collections
-  # - db.zips.find().limit(2);
