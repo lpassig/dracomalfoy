@@ -43,12 +43,13 @@ resource "azurerm_network_interface" "nic" {
 }
 
 # Create Virtual Machine
-resource "azurerm_virtual_machine" "vm" {
+resource "azurerm_linux_virtual_machine" "vm" {
   name                  = "${var.NAME}-vm"
   location              = nonsensitive(data.tfe_outputs.outputs.values.resource_group_location)
   resource_group_name   = nonsensitive(data.tfe_outputs.outputs.values.resource_group_name)
   network_interface_ids = ["${azurerm_network_interface.nic.id}"]
   vm_size               = "Standard_F2"
+  admin_username        = "ubuntu"
 
   # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
   delete_os_disk_on_termination = true
@@ -57,15 +58,16 @@ resource "azurerm_virtual_machine" "vm" {
     id = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image 
   }
 
-  storage_os_disk {
+  admin_ssh_key {
+    username   = "ubuntu"
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  os_disk {
     name              = "osdisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = true
   }
   
 }
