@@ -7,8 +7,8 @@
  data "hcp_packer_image" "mongodb-ubuntu" {
    bucket_name    = data.hcp_packer_iteration.mongodb-ubuntu.bucket_name
    iteration_id   = data.hcp_packer_iteration.mongodb-ubuntu.ulid
-   cloud_provider = "azurerm"
-   region         = "${var.resource_group_location}"
+   cloud_provider = "azure"
+   region         = nonsensitive(data.tfe_outputs.outputs.values.resource_group_location)
  }
 
 data "tfe_outputs" "outputs" {
