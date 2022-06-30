@@ -13,18 +13,58 @@
 
 data "tfe_outputs" "outputs" {
   organization = "propassig"
-  workspace = "hogwarts"
+  workspace = "Slytherin_Azure_LandingZone"
 }
 
-module "s3-bucket" {
-  source  = "app.terraform.io/propassig/s3-bucket/aws"
-  version = "3.3.0"
- 
+resource "azurerm_resource_group" "rg" {
+  name      = "project-${var.NAME}"
+  location  = nonsensitive(data.tfe_outputs.outputs.values.resource_group_location)
 
-  bucket               = "${var.NAME}-mongodb-backup-s3"
-  attach_public_policy = true
-  acl                  = "public-read"
+  tags = {
+    owner               = "${var.NAME}"
+    project             = "project-${var.NAME}"
+    terraform           = "true"
+    environment         = "dev"
+  }
+}
 
+resource "azurerm_network_interface" "nic" {
+  name                = "${var.NAME}-nic"
+  location            = "${azurerm_resource_group.rg.location}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+
+  ip_configuration {
+    name                          = "${var.NAME}-config"
+    subnet_id                     = nonsensitive(data.tfe_outputs.outputs.values.subnet_id)
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_virtual_machine" "vm" {
+  name                  = "${var.NAME}-vm"
+  location              = nonsensitive(data.tfe_outputs.outputs.values.resource_group_location)
+  resource_group_name   = nonsensitive(data.tfe_outputs.outputs.values.resource_group_name)
+  network_interface_ids = ["${azurerm_network_interface.nic.id}"]
+  vm_size               = "Standard_F2"
+
+  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
+  delete_os_disk_on_termination = true
+
+  storage_image_reference {
+    id = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image 
+  }
+
+  storage_os_disk {
+    name              = "osdisk"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  os_profile_linux_config {
+    disable_password_authentication = true
+  }
+  
 }
 
 module "ec2-instance" {

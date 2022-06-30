@@ -10,13 +10,7 @@ required_providers {
 provider "hcp" {}
 
 provider "azurerm" {
-  region = "${var.resource_group_location}"
-  default_tags {
-    tags = {
-      owner               = "${var.NAME}"
-      project             = "project-draco"
-      terraform           = "true"
-      environment         = "dev"
-    }
-  }    
+  subscription_id = "${var.subscription_id}"
+  tenant_id       = "${var.tenant_id}"
+  features {} 
 }
