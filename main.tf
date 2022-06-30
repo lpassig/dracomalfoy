@@ -67,23 +67,23 @@ resource "azurerm_virtual_machine" "vm" {
   
 }
 
-module "ec2-instance" {
-  source  = "app.terraform.io/propassig/ec2-instance/aws"
-  version = "4.0.0"
+# module "ec2-instance" {
+#   source  = "app.terraform.io/propassig/ec2-instance/aws"
+#   version = "4.0.0"
 
-  name = "${var.NAME}-instance"
+#   name = "${var.NAME}-instance"
                               
-  ami                         = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image (Alternative: "ami-02bcb9d2fae1fc079")
-  instance_type               = "t2.micro"
-  availability_zone           = nonsensitive(data.tfe_outputs.outputs.values.availability_zone)
-  monitoring                  = true
-  vpc_security_group_ids      = nonsensitive(data.tfe_outputs.outputs.values.vpc_security_group_ids)
-  subnet_id                   = nonsensitive(data.tfe_outputs.outputs.values.subnet_id)
-  associate_public_ip_address = true
-  iam_instance_profile        = nonsensitive(data.tfe_outputs.outputs.values.instance_profile)
+#   ami                         = data.hcp_packer_image.mongodb-ubuntu.cloud_image_id // packer image (Alternative: "ami-02bcb9d2fae1fc079")
+#   instance_type               = "t2.micro"
+#   availability_zone           = nonsensitive(data.tfe_outputs.outputs.values.availability_zone)
+#   monitoring                  = true
+#   vpc_security_group_ids      = nonsensitive(data.tfe_outputs.outputs.values.vpc_security_group_ids)
+#   subnet_id                   = nonsensitive(data.tfe_outputs.outputs.values.subnet_id)
+#   associate_public_ip_address = true
+#   iam_instance_profile        = nonsensitive(data.tfe_outputs.outputs.values.instance_profile)
 
-  user_data = file("cloud-init/start-db.yaml")
-}
+#   user_data = file("cloud-init/start-db.yaml")
+# }
 
 #
 ##
