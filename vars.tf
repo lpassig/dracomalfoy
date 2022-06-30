@@ -23,3 +23,9 @@ variable "NAME" {
     description   = "Name"
 
 }
+
+variable "PW" {
+    default = ""
+    description   = "Password"
+  
+}
