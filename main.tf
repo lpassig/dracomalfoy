@@ -29,11 +29,19 @@ resource "azurerm_resource_group" "rg" {
   }
 }
 
+resource "azurerm_storage_account" "storage" {
+  name                     = "project-${var.NAME}-storage"
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
 # Create a network interface
 resource "azurerm_network_interface" "nic" {
   name                = "${var.NAME}-nic"
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = "${var.NAME}-config"
