@@ -1,4 +1,10 @@
 terraform {
+  cloud {
+    organization = "propassig"
+    workspaces {
+      name = "Azure_Project_Draco"
+    }
+  }
 required_providers {
     azurerm = {
       source = "hashicorp/azurerm"
