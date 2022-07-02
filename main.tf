@@ -13,7 +13,7 @@
 
 data "tfe_outputs" "outputs" {
   organization = "propassig"
-  workspace = "Slytherin_Azure_LandingZone"
+  workspace = "Azure_Slytherin_LandingZone"
 }
 
 # Create a resource group
